@@ -13,15 +13,15 @@
 #include "server.h"
 #include "fermentation_controller.h"
 
-void time_control_task(void *pvParameters)
-{
-    for (;;)
-    {
-        fermentation_t* fermentation = get_fermentation();
-        time_t seconds = time(NULL);
-        if(seconds>=fermentation->start_date);
-    }
-}
+// void time_control_task(void *pvParameters)
+// {
+//     for (;;)
+//     {
+//         fermentation_t* fermentation = get_fermentation();
+//         time_t seconds = time(NULL);
+//         if(seconds>=fermentation->start_date);
+//     }
+// }
 
 void app_main()
 {
@@ -29,13 +29,13 @@ void app_main()
      * @brief Initializing NVS
      * 
      */
-    esp_err_t ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
+    esp_err_t err = nvs_flash_init();
+    if (err == ESP_ERR_NVS_NO_FREE_PAGES || err == ESP_ERR_NVS_NEW_VERSION_FOUND)
     {
         ESP_ERROR_CHECK(nvs_flash_erase());
-        ret = nvs_flash_init();
+        err = nvs_flash_init();
     }
-    ESP_ERROR_CHECK(ret);
+    ESP_ERROR_CHECK(err);
 
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     /**
@@ -58,6 +58,6 @@ void app_main()
      */
     ESP_ERROR_CHECK(start_server());
 
-    TaskHandle_t time_control_task_handle = NULL;
+    //TaskHandle_t time_control_task_handle = NULL;
     //xTaskCreate(time_control_task, "time_control", 256, NULL, 4, &time_control_task_handle);
 }

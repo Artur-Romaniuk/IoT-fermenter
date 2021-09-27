@@ -27,27 +27,27 @@ void wifi_init_sta(void)
 
     /* Waiting until either the connection is established (WIFI_CONNECTED_BIT) or connection failed for the maximum
      * number of re-tries (WIFI_FAIL_BIT). The bits are set by event_handler()  */
-    EventBits_t bits = xEventGroupWaitBits(s_wifi_event_group, WIFI_CONNECTED_BIT | WIFI_FAIL_BIT, pdFALSE, pdFALSE, portMAX_DELAY);
+    // EventBits_t bits = xEventGroupWaitBits(s_wifi_event_group, WIFI_CONNECTED_BIT | WIFI_FAIL_BIT, pdFALSE, pdFALSE, portMAX_DELAY);
 
-    /* xEventGroupWaitBits() returns the bits before the call returned, hence we can test which event actually
-     * happened. */
-    if (bits & WIFI_CONNECTED_BIT)
-    {
-        ESP_LOGI(WIFI_TAG, "connected to ap");
-    }
-    else if (bits & WIFI_FAIL_BIT)
-    {
-        ESP_LOGI(WIFI_TAG, "Failed to connect to ap");
-    }
-    else
-    {
-        ESP_LOGE(WIFI_TAG, "UNEXPECTED EVENT");
-    }
+    // /* xEventGroupWaitBits() returns the bits before the call returned, hence we can test which event actually
+    //  * happened. */
+    // if (bits & WIFI_CONNECTED_BIT)
+    // {
+    //     ESP_LOGI(WIFI_TAG, "connected to ap");
+    // }
+    // else if (bits & WIFI_FAIL_BIT)
+    // {
+    //     ESP_LOGI(WIFI_TAG, "Failed to connect to ap");
+    // }
+    // else
+    // {
+    //     ESP_LOGE(WIFI_TAG, "UNEXPECTED EVENT");
+    // }
 
-    /* The event will not be processed after unregister */
-    ESP_LOGI(WIFI_TAG, "Unregistering event handlers");
-    ESP_ERROR_CHECK(esp_event_handler_instance_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, instance_got_ip));
-    ESP_ERROR_CHECK(esp_event_handler_instance_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, instance_any_id));
-    ESP_ERROR_CHECK(esp_event_handler_instance_unregister(SC_EVENT, ESP_EVENT_ANY_ID, instance_any_sc));
-    ESP_LOGI(WIFI_TAG, "Unregistering event handlers complete");
+    // /* The event will not be processed after unregister */
+    // ESP_LOGI(WIFI_TAG, "Unregistering event handlers");
+    // ESP_ERROR_CHECK(esp_event_handler_instance_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, instance_got_ip));
+    // ESP_ERROR_CHECK(esp_event_handler_instance_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, instance_any_id));
+    // ESP_ERROR_CHECK(esp_event_handler_instance_unregister(SC_EVENT, ESP_EVENT_ANY_ID, instance_any_sc));
+    // ESP_LOGI(WIFI_TAG, "Unregistering event handlers complete");
 }

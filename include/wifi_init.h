@@ -18,6 +18,7 @@
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAIL_BIT BIT1
 #define SC_ESPTOUCH_DONE_BIT BIT2
+#define SC_STARTED BIT3
 
 EventGroupHandle_t s_wifi_event_group;
 

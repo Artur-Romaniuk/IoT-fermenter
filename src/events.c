@@ -11,8 +11,23 @@ void event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, voi
     {
         if (event_id == WIFI_EVENT_STA_START)
         {
-            //esp_wifi_connect();
-            xTaskCreate(smartconfig_task, "smartconfig_example_task", 4096, NULL, 3, NULL);
+            uint8_t ssid[33] = {0};
+            uint8_t password[65] = {0};
+            esp_err_t err = read_credentials_nvs(ssid, password);
+            if (err != ESP_OK)
+            {
+                ESP_LOGI(TAG, "Creating smartconfig_task");
+                xTaskCreate(smartconfig_task, "smartconfig_task", 4096, NULL, 3, NULL);
+            }
+            else
+            {
+                wifi_config_t wifi_config;
+                memset(&wifi_config, 0, sizeof(wifi_config_t));
+                memcpy(wifi_config.sta.ssid, ssid, sizeof(wifi_config.sta.ssid));
+                memcpy(wifi_config.sta.password, password, sizeof(wifi_config.sta.password));
+                ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
+                esp_wifi_connect();
+            }
         }
         else if (event_id == WIFI_EVENT_STA_DISCONNECTED)
         {
@@ -28,6 +43,16 @@ void event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, voi
                 xEventGroupSetBits(s_wifi_event_group, WIFI_FAIL_BIT);
             }
             ESP_LOGI(TAG, "connect to the AP fail");
+            if (!(xEventGroupGetBits(s_wifi_event_group) & SC_STARTED))
+            {
+                ESP_LOGI(TAG, "Starting smartconfig");
+                ESP_LOGI(TAG, "Creating smartconfig_task");
+                xTaskCreate(smartconfig_task, "smartconfig_task", 4096, NULL, 3, NULL);
+            }
+            else
+            {
+                esp_restart();
+            }
         }
     }
     else if (event_base == IP_EVENT)
@@ -59,7 +84,6 @@ void event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, voi
             uint8_t password[65] = {0};
             uint8_t rvd_data[33] = {0};
 
-            //bzero(&wifi_config, sizeof(wifi_config_t));
             memset(&wifi_config, 0, sizeof(wifi_config_t));
             memcpy(wifi_config.sta.ssid, evt->ssid, sizeof(wifi_config.sta.ssid));
             memcpy(wifi_config.sta.password, evt->password, sizeof(wifi_config.sta.password));
@@ -73,6 +97,7 @@ void event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, voi
             memcpy(password, evt->password, sizeof(evt->password));
             ESP_LOGI(TAG, "SSID:%s", ssid);
             ESP_LOGI(TAG, "PASSWORD:%s", password);
+            save_credentials_nvs(ssid, password);
             if (evt->type == SC_TYPE_ESPTOUCH_V2)
             {
                 ESP_ERROR_CHECK(esp_smartconfig_get_rvd_data(rvd_data, sizeof(rvd_data)));
