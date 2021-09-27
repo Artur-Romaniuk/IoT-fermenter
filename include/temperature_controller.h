@@ -1,0 +1,4 @@
+#if !defined(__TEMPERATURE_CONTROLLER__)
+#define __TEMPERATURE_CONTROLLER__
+
+#endif // __TEMPERATURE_CONTROLLER__
