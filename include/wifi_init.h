@@ -22,6 +22,10 @@
 
 EventGroupHandle_t s_wifi_event_group;
 
-void wifi_init_sta(void);
+/**
+ * @brief Starts wifi connection procedure.
+ * 
+ */
+void wifi_sta_start(void);
 
 #endif // __WIFI_INIT__

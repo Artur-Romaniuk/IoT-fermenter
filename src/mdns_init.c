@@ -1,7 +1,10 @@
 #include "mdns_init.h"
 
-void initialise_mdns(void)
+static const char *TAG = "MDNS";
+
+void mdns_start(void)
 {
+    ESP_LOGI(TAG, "Starting mdns");
     ESP_ERROR_CHECK(mdns_init());
     ESP_ERROR_CHECK(mdns_hostname_set(MDNS_HOST_NAME));
     ESP_ERROR_CHECK(mdns_instance_name_set(MDNS_INSTANCE));

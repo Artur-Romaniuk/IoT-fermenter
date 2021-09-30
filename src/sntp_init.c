@@ -1,6 +1,6 @@
 #include "sntp_init.h"
 
-void start_sntp()
+void sntp_start()
 {
     sntp_setoperatingmode(SNTP_OPMODE_POLL);
     sntp_setservername(0, "pool.ntp.org");

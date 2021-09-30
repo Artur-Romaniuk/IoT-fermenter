@@ -13,8 +13,8 @@ void event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, voi
         {
             uint8_t ssid[33] = {0};
             uint8_t password[65] = {0};
-            esp_err_t err = read_credentials_nvs(ssid, password);
-            if (err != ESP_OK)
+            esp_err_t err = read_credentials_nvs(ssid, password); //check if there are saved credentials
+            if (err != ESP_OK) //if not start SmartConfig
             {
                 ESP_LOGI(TAG, "Creating smartconfig_task");
                 xTaskCreate(smartconfig_task, "smartconfig_task", 4096, NULL, 3, NULL);
@@ -43,15 +43,17 @@ void event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, voi
                 xEventGroupSetBits(s_wifi_event_group, WIFI_FAIL_BIT);
             }
             ESP_LOGI(TAG, "connect to the AP fail");
+            erase_credentials_nvs();
             if (!(xEventGroupGetBits(s_wifi_event_group) & SC_STARTED))
             {
-                ESP_LOGI(TAG, "Starting smartconfig");
                 ESP_LOGI(TAG, "Creating smartconfig_task");
                 xTaskCreate(smartconfig_task, "smartconfig_task", 4096, NULL, 3, NULL);
             }
             else
             {
-                esp_restart();
+                ESP_LOGI(TAG, "Restarting smartconfig");
+                smartconfig_stop();
+                smartconfig_start();
             }
         }
     }

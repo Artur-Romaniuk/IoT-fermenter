@@ -7,9 +7,12 @@
 #include "esp_err.h"
 
 #define SPIFFS_TAG "spiffs"
-
-esp_err_t init_spiffs(void);
-
 extern const char *base_path;
+/**
+ * @brief Initializes SPIFFS for accessing files in /data.
+ * 
+ * @return esp_err_t 
+ */
+esp_err_t spiffs_start(void);
 
 #endif // __SPIFFS_INIT__

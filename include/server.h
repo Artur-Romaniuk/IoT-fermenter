@@ -21,6 +21,11 @@ typedef struct server_context
     char scratch[SCRATCH_BUFSIZE];
 } server_context_t;
 
-esp_err_t start_server();
+/**
+ * @brief Starts HTTP web server.
+ * 
+ * @return esp_err_t 
+ */
+esp_err_t server_start();
 
 #endif // __SERVER__

@@ -3,7 +3,7 @@
 const char *SERVER_TAG = "server";
 
 /* Function to start the  server */
-esp_err_t start_server()
+esp_err_t server_start()
 {
     server_context_t *context = calloc(1, sizeof(server_context_t));
 
@@ -36,7 +36,10 @@ esp_err_t start_server()
         .user_ctx = context};
     httpd_register_uri_handler(server, &time_get_uri);
 
-    /* URI handler structure for POST /uri */
+    /**
+     * @brief URI handler structure for POST /uri 
+     * 
+     */
     httpd_uri_t uri_post = {
         .uri = "/*",
         .method = HTTP_POST,

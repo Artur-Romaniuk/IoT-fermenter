@@ -2,6 +2,8 @@
 
 static const char *NVS_TAG = "NVS";
 static const char *credentials_nvs_namespace = "credentials";
+static const char *ssid_key = "ssid";
+static const char *password_key = "password";
 
 esp_err_t read_credentials_nvs(uint8_t ssid[33], uint8_t password[65])
 {
@@ -18,12 +20,12 @@ esp_err_t read_credentials_nvs(uint8_t ssid[33], uint8_t password[65])
     else
     {
         ESP_LOGI(NVS_TAG, "NVS openned");
-        err = nvs_get_str(nvs_handle, "ssid", (char *)ssid, &ssid_size);
+        err = nvs_get_str(nvs_handle, ssid_key, (char *)ssid, &ssid_size);
         if (err != ESP_OK)
         {
             if (err == ESP_ERR_NVS_NOT_FOUND)
             {
-                ESP_LOGI(NVS_TAG, "Saved SSID not found. Starting SmartConfig");
+                ESP_LOGI(NVS_TAG, "Saved SSID not found.");
             }
             else
             {
@@ -32,12 +34,12 @@ esp_err_t read_credentials_nvs(uint8_t ssid[33], uint8_t password[65])
             nvs_close(nvs_handle);
             return err;
         }
-        err = nvs_get_str(nvs_handle, "password", (char *)password, &password_size);
+        err = nvs_get_str(nvs_handle, password_key, (char *)password, &password_size);
         if (err != ESP_OK)
         {
             if (err == ESP_ERR_NVS_NOT_FOUND)
             {
-                ESP_LOGI(NVS_TAG, "Saved password not found. Starting SmartConfig");
+                ESP_LOGI(NVS_TAG, "Saved password not found.");
             }
             else
             {
@@ -65,14 +67,14 @@ esp_err_t save_credentials_nvs(uint8_t ssid[33], uint8_t password[65])
     else
     {
         ESP_LOGI(NVS_TAG, "NVS openned");
-        err = nvs_set_str(nvs_handle, "ssid", (char *)ssid);
+        err = nvs_set_str(nvs_handle, ssid_key, (char *)ssid);
         if (err != ESP_OK)
         {
             ESP_LOGE(NVS_TAG, "NVS ERROR while saving ssid: %s", esp_err_to_name(err));
             nvs_close(nvs_handle);
             return err;
         }
-        err = nvs_set_str(nvs_handle, "password", (char *)password);
+        err = nvs_set_str(nvs_handle, password_key, (char *)password);
         if (err != ESP_OK)
         {
             nvs_close(nvs_handle);
@@ -88,4 +90,23 @@ esp_err_t save_credentials_nvs(uint8_t ssid[33], uint8_t password[65])
         nvs_close(nvs_handle);
     }
     return ESP_OK;
+}
+
+esp_err_t erase_credentials_nvs()
+{
+    nvs_handle_t nvs_handle;
+    ESP_LOGI(NVS_TAG, "Opening nvs");
+    esp_err_t err = nvs_open(credentials_nvs_namespace, NVS_READWRITE, &nvs_handle);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(NVS_TAG, "NVS ERROR while opening nvs: %s", esp_err_to_name(err));
+    }
+    else
+    {
+        err = nvs_erase_key(nvs_handle, ssid_key);
+        err |= nvs_erase_key(nvs_handle, password_key);
+    }
+    ESP_LOGI(NVS_TAG, "Erased password and ssid");
+    nvs_close(nvs_handle);
+    return err;
 }

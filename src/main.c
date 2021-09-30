@@ -42,21 +42,21 @@ void app_main()
      * @brief Initializing MDNS, WiFi and SNTP
      * 
      */
-    mdns_init();
-    wifi_init_sta();
-    start_sntp();
+    mdns_start();
+    wifi_sta_start();
+    sntp_start();
 
     /**
      * @brief Initialize file storage
      * 
      */
-    ESP_ERROR_CHECK(init_spiffs());
+    ESP_ERROR_CHECK(spiffs_start());
 
     /**
      * @brief Start HTTP server
      * 
      */
-    ESP_ERROR_CHECK(start_server());
+    ESP_ERROR_CHECK(server_start());
 
     //TaskHandle_t time_control_task_handle = NULL;
     //xTaskCreate(time_control_task, "time_control", 256, NULL, 4, &time_control_task_handle);

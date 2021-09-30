@@ -17,9 +17,33 @@
 #include "spiffs_init.h"
 #include "fermentation_controller.h"
 
+/**
+ * @brief API handler for /api/info request
+ * 
+ * @param req 
+ * @return esp_err_t 
+ */
 esp_err_t info_get_handler(httpd_req_t *req);
+/**
+ * @brief API handler for /api/time request
+ * 
+ * @param req 
+ * @return esp_err_t 
+ */
 esp_err_t time_get_handler(httpd_req_t *req);
+/**
+ * @brief Handler for all GET requests
+ * 
+ * @param req 
+ * @return esp_err_t 
+ */
 esp_err_t common_get_handler(httpd_req_t *req);
+/**
+ * @brief Handler for POST request, from a HTTP form
+ * 
+ * @param req 
+ * @return esp_err_t 
+ */
 esp_err_t post_handler(httpd_req_t *req);
 
 #endif // __SERVER_HANDLERS

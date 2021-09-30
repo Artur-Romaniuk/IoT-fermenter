@@ -2,7 +2,10 @@
 #define __SNTP_INIT__
 
 #include "esp_sntp.h"
-
-void start_sntp();
+/**
+ * @brief Starts SNTP service.
+ * 
+ */
+void sntp_start();
 
 #endif // __SNTP_INIT__

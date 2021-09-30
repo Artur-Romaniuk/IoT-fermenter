@@ -1,8 +1,8 @@
 #include "spiffs_init.h"
 
-const char* base_path = "/spiffs";
+const char *base_path = "/spiffs";
 
-esp_err_t init_spiffs(void)
+esp_err_t spiffs_start(void)
 {
     ESP_LOGI(SPIFFS_TAG, "Initializing SPIFFS");
 
