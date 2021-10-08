@@ -1,11 +1,17 @@
 #include "fermentation_controller.h"
 
 fermentation_t fermentation;
+
 const char *FERMENTATION_TAG = "server";
 
 ferm_err_t start_fermentation_from_string(char *string, int length)
 {
-    if (fermentation.is_active == 0)
+    fermentation.hystheresis = 1;
+    if (strstr(string, "stop"))
+    {
+        stop_fermentation();
+    }
+    else if (fermentation.is_active == 0)
     {
         fermentation.beer_type = strstr(string, "Lager") != NULL ? LAGER : ALE;
         if (strstr(string, "primary") != NULL)
@@ -23,7 +29,12 @@ ferm_err_t start_fermentation_from_string(char *string, int length)
         {
             struct tm *day = localtime(&fermentation.start_date);
             day->tm_yday += fermentation.duration;
-            day->tm_yday -= day->tm_yday > 365 ? 365 : 0;
+            if (day->tm_yday > 365)
+            {
+                day->tm_yday -= 365;
+                day->tm_year++;
+            }
+            //day->tm_yday -= day->tm_yday > 365 ? 365 : 0;
 
             fermentation.end_date = *day;
         }
@@ -32,8 +43,6 @@ ferm_err_t start_fermentation_from_string(char *string, int length)
         fermentation.temperature = atof(temp_begin);
         start_fermentation();
     }
-    if (strstr(string, "stop"))
-        stop_fermentation();
 
     return FERM_OK;
 }
@@ -49,6 +58,7 @@ ferm_err_t start_fermentation()
 
 void stop_fermentation()
 {
+    ESP_LOGI(FERMENTATION_TAG, "Stopping fermentation");
     time_t seconds = time(NULL);
     fermentation.end_date = *localtime(&seconds);
     fermentation.is_active = 0;

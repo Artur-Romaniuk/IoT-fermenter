@@ -13,16 +13,41 @@
 #include "server.h"
 #include "fermentation_controller.h"
 #include "thermometer.h"
+#include "temperature_controller.h"
 
-// void time_control_task(void *pvParameters)
-// {
-//     for (;;)
-//     {
-//         fermentation_t* fermentation = get_fermentation();
-//         time_t seconds = time(NULL);
-//         if(seconds>=fermentation->start_date);
-//     }
-// }
+QueueHandle_t temperature_queue = NULL;
+
+void fermentation_control_task(void *pvParameters)
+{
+    const char *TAG = "fermentation_control_task";
+    fermentation_t *fermentation = get_fermentation();
+    for (;;)
+    {
+        time_t seconds = time(NULL);
+        struct tm *today = localtime(&seconds);
+        if ((today->tm_year == fermentation->end_date.tm_year && today->tm_yday > fermentation->end_date.tm_yday) || (today->tm_year > fermentation->end_date.tm_year))
+        {
+            fermentation->is_active = false;
+        }
+        if (fermentation->is_active == true)
+        {
+            static float temperature = 0.0;
+            xQueueReceive(temperature_queue, &temperature, 1000 / portTICK_PERIOD_MS);
+            ESP_LOGI(TAG, "Receiving temperature from the queue %f", temperature);
+            if (temperature - fermentation->temperature > fermentation->hystheresis)
+            {
+                ESP_LOGI(TAG, "Cooling. Current temp: %f. Target: %f", temperature, fermentation->temperature);
+                start_cooling();
+            }
+            else if (fermentation->temperature - temperature > fermentation->hystheresis)
+            {
+                ESP_LOGI(TAG, "No longer cooling Current temp: %f. Target: %f", temperature, fermentation->temperature);
+                stop_cooling();
+            }
+        }
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+    }
+}
 void thermometer_task(void *pvParameters)
 {
     const char *TAG = "thermometer_task";
@@ -40,7 +65,8 @@ void thermometer_task(void *pvParameters)
     {
         float temperature;
         read_temperature(owb, ds18b20_info, &temperature);
-        ESP_LOGI(TAG, "Temperature: %f", temperature);
+        xQueueSend(temperature_queue, &temperature, 0);
+        ESP_LOGI(TAG, "Sending temperature to the queue: %f", temperature);
         vTaskDelayUntil(&last_wake_time, sample_period / portTICK_PERIOD_MS);
     }
 }
@@ -79,9 +105,15 @@ void app_main()
      * 
      */
     ESP_ERROR_CHECK(server_start());
-    // vTaskDelay(1000 / portTICK_PERIOD_MS);
-    //TaskHandle_t time_control_task_handle = NULL;
-    //xTaskCreate(time_control_task, "time_control", 256, NULL, 4, &time_control_task_handle);
+    /**
+     * @brief Setting up GPIO for relay control
+     * 
+     */
+    ESP_ERROR_CHECK(cooler_relay_start());
+    temperature_queue = xQueueCreate(4, sizeof(float));
+    assert(temperature_queue);
+    TaskHandle_t fermentation_control_task_handle = NULL;
+    xTaskCreate(fermentation_control_task, "fermentation_control", 2048, NULL, 4, &fermentation_control_task_handle);
     TaskHandle_t thermometer_task_handle = NULL;
-    xTaskCreate(thermometer_task, "thermometer", 2048, NULL, 4, &thermometer_task_handle);
+    xTaskCreate(thermometer_task, "thermometer", 2048, NULL, 5, &thermometer_task_handle);
 }

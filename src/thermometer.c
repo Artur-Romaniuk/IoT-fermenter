@@ -13,7 +13,6 @@ void thermometer_start(OneWireBus *owb, DS18B20_Info *ds18b20_info)
 
     // Find connected device
     printf("Find device:\n");
-    OneWireBus_ROMCode device_rom_code = {0};
     int num_devices = 0;
     OneWireBus_SearchState search_state = {0};
     bool found = false;
@@ -24,7 +23,6 @@ void thermometer_start(OneWireBus *owb, DS18B20_Info *ds18b20_info)
         char rom_code_s[17];
         owb_string_from_rom_code(search_state.rom_code, rom_code_s, sizeof(rom_code_s));
         printf("  %d : %s\n", num_devices, rom_code_s);
-        device_rom_code = search_state.rom_code;
     }
     else
     {

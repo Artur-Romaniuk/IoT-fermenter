@@ -32,6 +32,7 @@ typedef struct
     fermentation_type_t fermentation_type;
     int duration;
     float temperature;
+    float hystheresis;
     time_t start_date;
     struct tm end_date;
 } fermentation_t;
