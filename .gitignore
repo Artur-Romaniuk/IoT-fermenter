@@ -1,0 +1,4 @@
+*build*
+cmake-build-release-esp-idf
+cmake-build-debug-esp-idf
+build

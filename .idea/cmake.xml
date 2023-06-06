@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeSharedSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Release-ESP-IDF" ENABLED="true" CONFIG_NAME="Release" TOOLCHAIN_NAME="ESP-IDF" GENERATION_OPTIONS="-G &quot;Unix Makefiles&quot;" BUILD_OPTIONS="-- -j 14" />
+      <configuration PROFILE_NAME="Debug-ESP-IDF" ENABLED="true" CONFIG_NAME="Debug" TOOLCHAIN_NAME="ESP-IDF" GENERATION_OPTIONS="-G &quot;Unix Makefiles&quot;" BUILD_OPTIONS="-- -j 14" />
+    </configurations>
+  </component>
+</project>
